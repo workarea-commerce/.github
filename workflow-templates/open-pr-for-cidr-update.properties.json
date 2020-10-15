@@ -2,6 +2,6 @@
   "name": "Flux Cluster: CloudFront: CIDR Updater - Open PR",
   "description": "2 of 3 Workflows for updating the CloudFront CIDR in Flux Cluster Repos",
   "iconName": "workarea",
-  "categories": ["Yaml"],
+  "categories": ["YAML", "Automation"],
   "filePatterns": ["releases/base-cluster.yaml"]
 }
