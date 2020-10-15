@@ -1,0 +1,24 @@
+# Open PR
+name: open-pr-for-cidr-update
+on:
+  push:
+    branches:    
+    - 'aws/**'
+
+jobs:
+  update-cloudfront-cidr:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get Base Branch
+      id: get_base_branch
+      run: |
+        branch=${GITHUB_REF#refs/heads/aws/}
+        IFS='-' read -ra branch_parts <<< "$branch"
+        echo "::set-output name=branch::${branch_parts[-1]}"
+    - uses: workarea-commerce/auto-create-pr-action@master
+      env:
+        GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
+        BASE_BRANCH: "${{ steps.get_base_branch.outputs.branch }}"
+        PULL_REQUEST_TITLE: "CloudFront CIDR Update"
+        PULL_REQUEST_DRAFT: "false"
+        PULL_LABELS: "auto-pr"

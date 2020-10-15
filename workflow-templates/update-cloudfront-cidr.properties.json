@@ -1,0 +1,7 @@
+{
+  "name": "Flux Cluster: CloudFront: CIDR Updater",
+  "description": "1 of 3 Workflows for updating the CloudFront CIDR in Flux Cluster Repos",
+  "iconName": "workarea",
+  "categories": ["Yaml"],
+  "filePatterns": ["releases/base-cluster.yaml"]
+}

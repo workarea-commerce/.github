@@ -1,0 +1,19 @@
+name: merge-cidr-update-pr
+
+on:
+  pull_request:
+    types: ["labeled"]
+
+jobs:
+  merge-cidr-update-pr:
+    runs-on: ubuntu-latest
+    steps:
+    - name: PR Merge Bot
+      uses: squalrus/merge-bot@v0.4.2
+      with:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+        test: false
+        reviewers: false
+        labels: auto-pr
+        checks_enabled: true
+        method: squash

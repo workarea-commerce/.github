@@ -1,0 +1,56 @@
+# Update the CIDRs and Commit
+name: update-cloudfront-cidr
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Git Branch to Use'
+        required: true
+      url:
+        description: 'The URL of the ip-ranges.json'
+        required: true
+
+jobs:
+  update-cloudfront-cidr-staging:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        ref: staging
+        token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+    - name: Create release branch
+      run: git checkout -b aws/${{ github.event.inputs.branch }}-staging
+    - name: Update CIDRS
+      uses: workarea-commerce/update-flux-cloudfront-cidrs-action@v1
+      with:
+        url: ${{ github.event.inputs.url }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply CloudFront CIDR Update
+        branch: aws/${{ github.event.inputs.branch }}-staging
+        commit_user_name: Workarea GitHub Actions Bot
+        commit_user_email: github-actions-bot@workarea.com
+        commit_author: Workarea Actions Bot <github-actions-bot@workarea.com>
+  update-cloudfront-cidr-master:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        ref: master
+        token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+    - name: Create release branch
+      run: git checkout -b aws/${{ github.event.inputs.branch }}-master
+    - name: Update CIDRS
+      uses: workarea-commerce/update-flux-cloudfront-cidrs-action@v1
+      with:
+        url: ${{ github.event.inputs.url }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply CloudFront CIDR Update
+        branch: aws/${{ github.event.inputs.branch }}-master
+        commit_user_name: Workarea GitHub Actions Bot
+        commit_user_email: github-actions-bot@workarea.com
+        commit_author: Workarea Actions Bot <github-actions-bot@workarea.com>
