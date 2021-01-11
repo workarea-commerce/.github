@@ -1,0 +1,7 @@
+{
+  "name": "Workarea App Auto Deployer",
+  "description": "Enables the trigger of a workarea deploy",
+  "iconName": "workarea",
+  "categories": ["Ruby", "Automation"],
+  "filePatterns": ["config.ru"]
+}
