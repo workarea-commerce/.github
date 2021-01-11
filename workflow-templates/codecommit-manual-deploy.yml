@@ -1,0 +1,28 @@
+# You would create one of these 
+# per branch you want to manually deploy
+name: Workarea Manual Master Deploy
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+        # The branch to sync/deploy
+        ref: master
+    - uses: webfactory/ssh-agent@v0.2.0
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      with:
+        # secrets.WORKAREA_MASTER_DEPLOY_KEY = The respective key to use for the branch
+        ssh-private-key: ${{ secrets.WORKAREA_MASTER_DEPLOY_KEY }}
+    - name: 'SSH: trust host'
+      run: echo "git-codecommit.us-east-1.amazonaws.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdut7aOM5Zh16OJ+GOP75O7x5oyHKAiA1ieuySetj/hAq4VrAuZV5R2TypZJcKBaripOtTc/Sr0FOU4YvxUla40PPH8N1lbDp6Pnc4BexKsrt2kz++TqIKx5FHmUQV3mit16kxRwHey3dv030+qXBDo3WPQjm2+JLoq0XcadpnCAMCd3ChaBnDRM+51GZbuEFilpZsxUchUzl0gseC+shYOBd7TqxTlIhj/56d/YF1kq7RMZYrwBnyYdVhpLeUJCeYjyx/O6FPSezNTLiinz5jjioWZATgn+G8feL/hIsk8g+7JoIcb2muUlymdxs+8l2lS+8MXqT0q9ohT+Knhb2j" >> ~/.ssh/known_hosts
+    - name: Sync
+      # secrets.WORKAREA_MASTER_DEPLOY_REPO = The respective repo to use for the branch
+      run: |
+        git remote add deploy "${{ secrets.WORKAREA_MASTER_DEPLOY_REPO }}"
+        git push deploy "master:master" -f

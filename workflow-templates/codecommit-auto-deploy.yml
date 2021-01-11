@@ -1,0 +1,50 @@
+name: Workarea Deploy
+on:
+  push:
+    # List all branches that should trigger a deploy
+    branches:
+    - master
+    - staging
+
+# There should be a job for each branch with an 
+# if statement targeting said branch
+# For each job there are 2 required secrets:
+#   WORKAREA_{BRANCH}_DEPLOY_KEY = Private key of code commit user with access
+#   WORKAREA_{BRANCH}_DEPLOY_REPO = The git repo in the format ssh://user@git-codecommit.us-east-1.amazonaws.com/v1/repos/...
+jobs:
+  staging-deploy:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - uses: webfactory/ssh-agent@v0.2.0
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      with:
+        ssh-private-key: ${{ secrets.WORKAREA_STAGING_DEPLOY_KEY }}
+    - name: 'SSH: trust host'
+      run: echo "git-codecommit.us-east-1.amazonaws.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdut7aOM5Zh16OJ+GOP75O7x5oyHKAiA1ieuySetj/hAq4VrAuZV5R2TypZJcKBaripOtTc/Sr0FOU4YvxUla40PPH8N1lbDp6Pnc4BexKsrt2kz++TqIKx5FHmUQV3mit16kxRwHey3dv030+qXBDo3WPQjm2+JLoq0XcadpnCAMCd3ChaBnDRM+51GZbuEFilpZsxUchUzl0gseC+shYOBd7TqxTlIhj/56d/YF1kq7RMZYrwBnyYdVhpLeUJCeYjyx/O6FPSezNTLiinz5jjioWZATgn+G8feL/hIsk8g+7JoIcb2muUlymdxs+8l2lS+8MXqT0q9ohT+Knhb2j" >> ~/.ssh/known_hosts
+    - name: Sync
+      run: |
+        git remote add deploy "${{ secrets.WORKAREA_STAGING_DEPLOY_REPO }}"
+        git push deploy "staging:staging" -f
+  prduction-deploy:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - uses: webfactory/ssh-agent@v0.2.0
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      with:
+        ssh-private-key: ${{ secrets.WORKAREA_MASTER_DEPLOY_KEY }}
+    - name: 'SSH: trust host'
+      run: echo "git-codecommit.us-east-1.amazonaws.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdut7aOM5Zh16OJ+GOP75O7x5oyHKAiA1ieuySetj/hAq4VrAuZV5R2TypZJcKBaripOtTc/Sr0FOU4YvxUla40PPH8N1lbDp6Pnc4BexKsrt2kz++TqIKx5FHmUQV3mit16kxRwHey3dv030+qXBDo3WPQjm2+JLoq0XcadpnCAMCd3ChaBnDRM+51GZbuEFilpZsxUchUzl0gseC+shYOBd7TqxTlIhj/56d/YF1kq7RMZYrwBnyYdVhpLeUJCeYjyx/O6FPSezNTLiinz5jjioWZATgn+G8feL/hIsk8g+7JoIcb2muUlymdxs+8l2lS+8MXqT0q9ohT+Knhb2j" >> ~/.ssh/known_hosts
+    - name: Sync
+      run: |
+        git remote add deploy "${{ secrets.WORKAREA_MASTER_DEPLOY_REPO }}"
+        git push deploy "master:master" -f
